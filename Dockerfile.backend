@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl iputils-ping nmap openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ ./backend/
+COPY run.py .
+
+RUN mkdir -p /app/data /app/playbooks /app/terraform /app/ssh-keys
+
+EXPOSE 8000 1162/udp 5514/udp 5514/tcp
+
+CMD ["python", "run.py"]

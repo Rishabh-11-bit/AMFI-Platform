@@ -1,0 +1,54 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AMFI Platform — Full Stack
+# Usage:
+#   docker-compose up --build          (first time)
+#   docker-compose up -d               (background)
+#   docker-compose logs -f amfi-api    (watch logs)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Backend API + all listeners + scheduler ──────────────────────────────
+  amfi-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: amfi-api
+    ports:
+      - "8000:8000"       # REST API + Alertmanager webhook + Swagger docs
+      - "1162:1162/udp"   # SNMP traps  (on host: NAT 162 → 1162)
+      - "5514:5514/udp"   # Syslog UDP  (on host: NAT 514 → 5514)
+      - "5514:5514/tcp"   # Syslog TCP
+    volumes:
+      - amfi-data:/app/data         # SQLite DB
+      - ./playbooks:/app/playbooks  # Ansible playbooks
+      - ./terraform:/app/terraform  # Terraform modules
+      - ./ssh-keys:/app/ssh-keys    # SSH private keys for remediation
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////app/data/amfi.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend (Nginx serving React build) ─────────────────────────────────
+  amfi-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: amfi-frontend
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS (configure SSL cert in nginx/ssl/)
+    depends_on:
+      - amfi-api
+    restart: unless-stopped
+
+volumes:
+  amfi-data:
