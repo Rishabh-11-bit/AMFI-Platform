@@ -1,0 +1,43 @@
+# ── Web Framework ────────────────────────────────────────────────
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# ── Database ─────────────────────────────────────────────────────
+sqlalchemy>=2.0.40,<3.0.0
+asyncpg==0.29.0
+aiosqlite==0.20.0
+alembic==1.13.1
+
+# ── Auth ─────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+bcrypt>=4.0.0
+passlib[bcrypt]==1.7.4
+cryptography>=42.0.0       # Fernet encryption for stored credentials
+
+# ── Rate limiting ─────────────────────────────────────────────────
+slowapi==0.1.9              # App-layer rate limiting (independent of nginx)
+
+# ── Config ───────────────────────────────────────────────────────
+pydantic>=2.0
+pydantic-settings>=2.0
+
+# ── HTTP Client (Ollama + Claude + NMS APIs) ─────────────────────
+httpx==0.26.0
+
+# ── SSH ──────────────────────────────────────────────────────────
+paramiko==3.4.0
+
+# ── Ansible (optional, for playbook execution) ───────────────────
+# Uncomment if you use Ansible playbooks:
+# ansible-runner==2.3.4
+
+# ── Claude API (optional, only if using Claude instead of Ollama) ─
+anthropic>=0.40.0
+
+# ── Monitoring ───────────────────────────────────────────────────
+pysnmp>=6.0.0        # SNMP collection for network devices
+icmplib>=3.0.0       # ICMP ping (falls back to TCP if no raw-socket privileges)
+
+# ── Utilities ────────────────────────────────────────────────────
+python-dotenv==1.0.0
